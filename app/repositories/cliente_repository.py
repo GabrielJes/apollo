@@ -2,41 +2,41 @@ import os
 
 import psycopg
 
-from app.models.jogador import Jogador
+from app.models.cliente import Cliente
 
 
-class JogadorRepository:
+class ClienteRepository:
     def __init__(self, database_url: str | None = None) -> None:
         self.database_url = database_url or os.getenv("DATABASE_URL", "")
 
-    def create(self, nome: str) -> Jogador:
+    def create(self, nome: str) -> Cliente:
         with psycopg.connect(self.database_url) as connection:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "INSERT INTO jogadores (nome) VALUES (%s) RETURNING id, nome",
+                    "INSERT INTO clientes (nome) VALUES (%s) RETURNING id, nome",
                     (nome,),
                 )
-                jogador_id, jogador_nome = cursor.fetchone()
-        return Jogador(id=jogador_id, nome=jogador_nome)
+                cliente_id, cliente_nome = cursor.fetchone()
+        return Cliente(id=cliente_id, nome=cliente_nome)
 
-    def list_all(self) -> list[Jogador]:
+    def list_all(self) -> list[Cliente]:
         with psycopg.connect(self.database_url) as connection:
             with connection.cursor() as cursor:
-                cursor.execute("SELECT id, nome FROM jogadores ORDER BY id")
+                cursor.execute("SELECT id, nome FROM clientes ORDER BY id")
                 rows = cursor.fetchall()
-        return [Jogador(id=jogador_id, nome=nome) for jogador_id, nome in rows]
+        return [Cliente(id=cliente_id, nome=nome) for cliente_id, nome in rows]
 
-    def get_by_id(self, jogador_id: int) -> Jogador | None:
+    def get_by_id(self, cliente_id: int) -> Cliente | None:
         with psycopg.connect(self.database_url) as connection:
             with connection.cursor() as cursor:
-                cursor.execute("SELECT id, nome FROM jogadores WHERE id = %s", (jogador_id,))
+                cursor.execute("SELECT id, nome FROM clientes WHERE id = %s", (cliente_id,))
                 row = cursor.fetchone()
         if row is None:
             return None
-        return Jogador(id=row[0], nome=row[1])
+        return Cliente(id=row[0], nome=row[1])
 
-    def delete(self, jogador_id: int) -> bool:
+    def delete(self, cliente_id: int) -> bool:
         with psycopg.connect(self.database_url) as connection:
             with connection.cursor() as cursor:
-                cursor.execute("DELETE FROM jogadores WHERE id = %s", (jogador_id,))
+                cursor.execute("DELETE FROM clientes WHERE id = %s", (cliente_id,))
                 return cursor.rowcount > 0

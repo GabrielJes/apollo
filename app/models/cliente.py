@@ -2,6 +2,6 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Jogador:
+class Cliente:
     id: int
     nome: str
